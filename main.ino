@@ -11,6 +11,9 @@ green1,green2,green3,green4,green5 = 15,16,17,18,19;
 //returns true if any button is being pressed
 bool startConditionMet();
 
+//accepts a button pin, and returns the corresponding led pin
+int correspondingLED(int pin);
+
 //returns a random integer from 0 to 4 inclusive and sets that pins corresponding led to high
 int selectRandomButton_BLUE();
 
@@ -19,6 +22,9 @@ int selectRandomButton_GREEN();
 
 //accepts a button pin, and sets the corresponding led low
 void killLED(int pin);
+
+//turns off all the leds
+void killAllLEDs();
 
 //flash all the blue buttons, and turn off all the green ones.
 void flashWinner_BLUE();
@@ -51,6 +57,7 @@ void loop(){
 
     //waits until the game is started
     if(startConditionMet()){
+        killAllLEDs();
         gameInProgress = true;
 
         active_BLUE = selectRandomButton_BLUE();
@@ -84,3 +91,9 @@ void loop(){
     }
     
 }
+
+//function implementations 
+
+int correspondingLED(int pin){
+    return pin + 10;
+};
