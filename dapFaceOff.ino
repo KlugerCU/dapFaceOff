@@ -1,11 +1,14 @@
 /* pin layout
 buttons:
-    blue buttons 1-5 = pins 2-6;
-    green buttons 1-5 = pins 7-11;
-
+    blue buttons 1-5 = pins 2-6; 
+    blue temp = 2 and 3
+    red buttons 1-5 = pins 7-11;
+    red temp = 7 and 8
 leds:
     blue buttons 1-5 = analog pins 0-4 = digital pins 54-58;
-    green buttons 1-5 = analog pins 5-9 = digital pins 59-63;
+                        analog pins 0-2 = digital 54-56
+    red buttons 1-5 = analog pins 5-9 = digital pins 59-63;
+                    analog pins 5-6 = digital pins 59-61
 */
 
 // button presses necessary to win the game
@@ -15,14 +18,14 @@ const int stage3 = 45;
 
 // keeps track of the currently lit up button
 int activeButton_BLUE;
-int activeButton_GREEN;
+int activeButton_red;
 
 // 0 = startScreen, 1 = simple, 2 = hard mode, 3 = impossible
 int gameMode = 0;
 
 // keeps track of button presses
 int score_BLUE = 0;
-int score_GREEN = 0;
+int score_red = 0;
 
 
 /*
@@ -61,7 +64,7 @@ void loop()
         killAllLEDs();
 
         activeButton_BLUE = selectRandomButton_BLUE();
-        activeButton_GREEN = selectRandomButton_GREEN();
+        activeButton_red = selectRandomButton_red();
     }
 
     Serial.print("GameMode: ");
@@ -71,14 +74,14 @@ void loop()
         Serial.print("score_BLUE: ");
         Serial.print(score_BLUE);
 
-        Serial.print("\t score_GREEN: ");
-        Serial.println(score_GREEN);
+        Serial.print("\t score_red: ");
+        Serial.println(score_red);
         gameMode1();
 
         checkWinCondition();
         delay(50);
     }
-
+    
     while (gameMode == 2)
     {
         if (checkStage2Condition())
@@ -127,15 +130,15 @@ bool gameStarted()
 // returns a random integer from 2 to 6 inclusive and sets that pins corresponding led to high
 int selectRandomButton_BLUE()
 {
-    int rand = random(2, 7);
+    int rand = random(2, 4);
     digitalWrite(correspondingLED(rand), HIGH);
     return rand;
 };
 
 // returns a random integer from 7 to 11 inclusive and sets that pins corresponding led to high
-int selectRandomButton_GREEN()
+int selectRandomButton_red()
 {
-    int rand = random(7, 12);
+    int rand = random(7, 9);
     digitalWrite(correspondingLED(rand), HIGH);
     return rand;
 }
@@ -154,7 +157,7 @@ void killAllLEDs()
     }
 };
 
-// accepts a bool, 0 if blue, 1 if green, flash all the winners buttons, and turn off all the opponent buttons.
+// accepts a bool, 0 if blue, 1 if red, flash all the winners buttons, and turn off all the opponent buttons.
 void flashWinner(bool winner)
 {
     // lower number is faster blinking
@@ -210,7 +213,7 @@ void resetGame(){
     }
 
     score_BLUE = 0;
-    score_GREEN = 0;
+    score_red = 0;
 
 };
 
@@ -224,11 +227,11 @@ void gameMode1()
         activeButton_BLUE = selectRandomButton_BLUE();
         score_BLUE++;
     }
-    else if (digitalRead(activeButton_GREEN))
+    else if (digitalRead(activeButton_red))
     {
-        digitalWrite(correspondingLED(activeButton_GREEN), LOW);
-        activeButton_GREEN = selectRandomButton_GREEN();
-        score_GREEN++;
+        digitalWrite(correspondingLED(activeButton_red), LOW);
+        activeButton_red = selectRandomButton_red();
+        score_red++;
     }
 }
 
@@ -241,7 +244,7 @@ void gameMode3(){};
 // check for transition to stage 2
 bool checkStage2Condition()
 {
-    if (score_GREEN >= stage2)
+    if (score_red >= stage2)
     {
         flashWinner(1);
         resetGame();
@@ -257,7 +260,7 @@ bool checkStage2Condition()
 // check for transition to stage 3
 bool checkStage3Condition()
 {
-    if (score_GREEN >= stage3)
+    if (score_red >= stage3)
     {
         flashWinner(1);
         resetGame();
@@ -273,7 +276,7 @@ bool checkStage3Condition()
 // check if any team has won, if so, flash their buttons and reset the game
 void checkWinCondition()
 {
-    if (score_GREEN >= score_WIN)
+    if (score_red >= score_WIN)
     {
         flashWinner(1);
         resetGame();
